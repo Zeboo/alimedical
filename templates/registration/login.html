@@ -1,0 +1,293 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In · Ali Medical and Dental Complex</title>
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-dark: #0f172a;
+            --primary-light: #3b82f6;
+            --danger: #dc2626;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .login-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+        }
+
+        .login-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            padding: 60px 56px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .login-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.10), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08), transparent 50%);
+            pointer-events: none;
+        }
+
+        .brand {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.15);
+            display: grid;
+            place-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            backdrop-filter: blur(8px);
+        }
+
+        .brand-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0.95;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 480px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.4rem;
+            line-height: 1.15;
+            margin: 0 0 18px;
+            font-weight: 700;
+        }
+
+        .hero-content p {
+            font-size: 1.02rem;
+            line-height: 1.65;
+            color: rgba(255,255,255,0.85);
+            margin: 0 0 28px;
+        }
+
+        .hero-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .hero-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+        }
+
+        .hero-features li::before {
+            content: "✓";
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .hero-footer {
+            position: relative;
+            z-index: 1;
+            color: rgba(255,255,255,0.65);
+            font-size: 0.85rem;
+        }
+
+        .login-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 48px;
+            background: #ffffff;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .login-card .subtitle {
+            margin: 0 0 32px;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.98rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px 18px;
+            background: var(--primary);
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.05s ease;
+            margin-top: 6px;
+        }
+
+        .btn-submit:hover { background: #1e40af; }
+        .btn-submit:active { transform: translateY(1px); }
+
+        .alert {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 18px;
+        }
+
+        .alert ul { margin: 0; padding-left: 18px; }
+
+        .form-foot {
+            text-align: center;
+            margin-top: 22px;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 900px) {
+            .login-shell { grid-template-columns: 1fr; }
+            .login-hero { padding: 40px 28px; min-height: 240px; }
+            .hero-content h1 { font-size: 1.7rem; }
+            .hero-features { display: none; }
+            .login-panel { padding: 40px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-shell">
+        <aside class="login-hero">
+            <div class="brand">
+                <div class="brand-mark">A</div>
+                <div class="brand-name">Ali Medical &amp; Dental Complex</div>
+            </div>
+
+            <div class="hero-content">
+                <h1>Welcome to the Hospital Management Portal.</h1>
+                <p>Securely manage patients, doctors and OPD visits from a single, modern dashboard.</p>
+                <ul class="hero-features">
+                    <li>Token &amp; voucher generation in seconds</li>
+                    <li>Patient and doctor records at your fingertips</li>
+                    <li>Role-based access for staff and administrators</li>
+                </ul>
+            </div>
+
+            <div class="hero-footer">© Ali Medical and Dental Complex, Fateh Jang</div>
+        </aside>
+
+        <main class="login-panel">
+            <form class="login-card" method="post" action="">
+                {% csrf_token %}
+                <h2>Sign in</h2>
+                <p class="subtitle">Enter your credentials to access the dashboard.</p>
+
+                {% if form.errors or form.non_field_errors %}
+                    <div class="alert">
+                        {% if form.non_field_errors %}
+                            {{ form.non_field_errors }}
+                        {% else %}
+                            Invalid username or password. Please try again.
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_username">Username</label>
+                    <input type="text" name="username" id="id_username" autofocus autocapitalize="none" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password">Password</label>
+                    <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+                <button type="submit" class="btn-submit">Sign in</button>
+
+                <div class="form-foot">Authorized personnel only.</div>
+            </form>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,373 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        .dashboard-shell {
+            display: grid;
+            gap: 24px;
+        }
+
+        .dashboard-hero {
+            background: linear-gradient(135deg, #1d4ed8, #0f172a);
+            border-radius: 18px;
+            color: #fff;
+            padding: 28px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+        }
+
+        .dashboard-hero h1 {
+            color: #fff;
+            margin: 0 0 10px;
+            font-size: 2rem;
+        }
+
+        .dashboard-hero p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.82);
+            max-width: 780px;
+            line-height: 1.6;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card,
+        .dashboard-card {
+            background: var(--body-bg);
+            border: 1px solid var(--hairline-color);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-label {
+            color: var(--body-quiet-color);
+            display: block;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: var(--body-fg);
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-note {
+            color: var(--body-quiet-color);
+            display: block;
+            margin-top: 8px;
+            font-size: 0.86rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .dashboard-column {
+            display: grid;
+            gap: 24px;
+        }
+
+        .dashboard-card {
+            padding: 22px;
+        }
+
+        .dashboard-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.2rem;
+        }
+
+        .dashboard-card p.section-note {
+            margin: 0 0 18px;
+            color: var(--body-quiet-color);
+        }
+
+        .trend-chart {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 14px;
+            min-height: 260px;
+            align-items: end;
+        }
+
+        .trend-bar-group {
+            display: grid;
+            justify-items: center;
+            gap: 8px;
+        }
+
+        .trend-bar-wrap {
+            width: 100%;
+            max-width: 48px;
+            height: 180px;
+            display: flex;
+            align-items: end;
+        }
+
+        .trend-bar {
+            width: 100%;
+            border-radius: 14px 14px 6px 6px;
+            background: linear-gradient(180deg, #60a5fa, #2563eb);
+            min-height: 8px;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .trend-count {
+            font-weight: 700;
+        }
+
+        .trend-label,
+        .trend-income {
+            color: var(--body-quiet-color);
+            font-size: 0.86rem;
+            text-align: center;
+        }
+
+        .doctor-list,
+        .recent-visit-list,
+        .activity-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .doctor-row,
+        .recent-visit-item,
+        .activity-item {
+            border: 1px solid var(--hairline-color);
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: color-mix(in srgb, var(--body-bg) 90%, var(--darkened-bg) 10%);
+        }
+
+        .doctor-row-header,
+        .recent-visit-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .doctor-progress {
+            width: 100%;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--hairline-color);
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .doctor-progress-bar {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .doctor-meta,
+        .recent-visit-meta,
+        .activity-item {
+            color: var(--body-quiet-color);
+            font-size: 0.92rem;
+        }
+
+        .dashboard-bottom {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .recent-visit-header a,
+        .activity-item a {
+            font-weight: 600;
+        }
+
+        .empty-state {
+            color: var(--body-quiet-color);
+            border: 1px dashed var(--hairline-color);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid,
+            .dashboard-bottom {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="dashboard-shell">
+{% if dashboard %}
+    <section class="dashboard-hero">
+        <h1>{{ site_header }}</h1>
+        <p>
+            Monitor patient flow, OPD performance, doctor productivity, and revenue at a glance.
+            Updated {{ dashboard.generated_at|date:"M d, Y h:i A" }}.
+        </p>
+    </section>
+
+    <section class="dashboard-stats">
+        <article class="stat-card">
+            <span class="stat-label">Total patients</span>
+            <div class="stat-value">{{ dashboard.total_patients }}</div>
+            <span class="stat-note">Registered patient records</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Doctors</span>
+            <div class="stat-value">{{ dashboard.total_doctors }}</div>
+            <span class="stat-note">Active doctors in OPD</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">OPD visits</span>
+            <div class="stat-value">{{ dashboard.total_visits }}</div>
+            <span class="stat-note">Total completed OPD visits</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Total income</span>
+            <div class="stat-value">Rs. {{ dashboard.total_income|floatformat:0 }}</div>
+            <span class="stat-note">Collected from OPD visits</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Today’s visits</span>
+            <div class="stat-value">{{ dashboard.today_visits }}</div>
+            <span class="stat-note">Current day OPD load</span>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Today’s income</span>
+            <div class="stat-value">Rs. {{ dashboard.today_income|floatformat:0 }}</div>
+            <span class="stat-note">Today’s OPD collection</span>
+        </article>
+    </section>
+
+    <section class="dashboard-grid">
+        <div class="dashboard-column">
+            <article class="dashboard-card">
+                <h2>Last 7 days visit trend</h2>
+                <p class="section-note">A quick visual snapshot of OPD activity and daily income.</p>
+                <div class="trend-chart">
+                    {% for day in dashboard.last_7_days %}
+                        <div class="trend-bar-group">
+                            <div class="trend-count">{{ day.visit_count }}</div>
+                            <div class="trend-bar-wrap">
+                                <div class="trend-bar" style="height: {{ day.bar_height }}%;"></div>
+                            </div>
+                            <div class="trend-label">{{ day.label }}</div>
+                            <div class="trend-income">Rs. {{ day.income|floatformat:0 }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="dashboard-card">
+                <h2>Application modules</h2>
+                <p class="section-note">Quick access to your hospital admin sections.</p>
+                {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+            </article>
+        </div>
+
+        <div class="dashboard-column">
+            <article class="dashboard-card">
+                <h2>Top doctors by OPD income</h2>
+                <p class="section-note">Who is driving the most OPD revenue right now.</p>
+                {% if dashboard.top_doctors %}
+                    <div class="doctor-list">
+                        {% for doctor in dashboard.top_doctors %}
+                            <div class="doctor-row">
+                                <div class="doctor-row-header">
+                                    <span>{{ doctor.doctor__name }}</span>
+                                    <span>Rs. {{ doctor.income|floatformat:0 }}</span>
+                                </div>
+                                <div class="doctor-progress">
+                                    <div class="doctor-progress-bar" style="width: {{ doctor.progress_width }}%;"></div>
+                                </div>
+                                <div class="doctor-meta">{{ doctor.visit_count }} visits handled</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">No doctor performance data yet.</div>
+                {% endif %}
+            </article>
+
+            <article class="dashboard-card">
+                <h2>Monthly snapshot</h2>
+                <p class="section-note">This month’s OPD income so far.</p>
+                <div class="stat-value">Rs. {{ dashboard.month_income|floatformat:0 }}</div>
+                <span class="stat-note">Keep an eye on growth without needing spreadsheets.</span>
+            </article>
+        </div>
+    </section>
+
+    <section class="dashboard-bottom">
+        <article class="dashboard-card">
+            <h2>Recent OPD visits</h2>
+            <p class="section-note">Latest patient flow through the OPD desk.</p>
+            {% if dashboard.recent_visits %}
+                <div class="recent-visit-list">
+                    {% for visit in dashboard.recent_visits %}
+                        <div class="recent-visit-item">
+                            <div class="recent-visit-header">
+                                <a href="/admin/opd/opdvisit/{{ visit.pk }}/change/">{{ visit.patient }}</a>
+                                <span>Rs. {{ visit.total|floatformat:0 }}</span>
+                            </div>
+                            <div class="recent-visit-meta">
+                                {{ visit.doctor }} · Token {{ visit.token_number }} · {{ visit.created_at|date:"M d, Y h:i A" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">No OPD visits yet. Add your first visit to start tracking activity.</div>
+            {% endif %}
+        </article>
+
+        <article class="dashboard-card">
+            <h2>Recent admin activity</h2>
+            <p class="section-note">A quick audit trail of the latest admin changes.</p>
+            {% if log_entries %}
+                <div class="activity-list">
+                    {% for entry in log_entries|slice:":6" %}
+                        <div class="activity-item">
+                            {% if entry.is_addition %}Added{% elif entry.is_change %}Updated{% elif entry.is_deletion %}Deleted{% else %}Touched{% endif %}
+                            {% if entry.get_admin_url %}
+                                <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                            {% else %}
+                                {{ entry.object_repr }}
+                            {% endif %}
+                            <div>{{ entry.content_type }} </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">Recent admin actions will appear here.</div>
+            {% endif %}
+        </article>
+    </section>
+{% else %}
+    <section class="dashboard-hero">
+        <h1>Welcome, {{ user.get_username }}</h1>
+        <p>Use the menu below to add OPD visits and manage patient records.</p>
+    </section>
+    <article class="dashboard-card" style="padding:20px;">
+        {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    </article>
+{% endif %}
+</div>
+{% endblock %}

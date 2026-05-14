@@ -1,0 +1,48 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        .opd-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 0 0 20px;
+        }
+
+        .opd-summary-card {
+            background: var(--body-bg);
+            border: 1px solid var(--hairline-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .opd-summary-label {
+            color: var(--body-quiet-color);
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+
+        .opd-summary-value {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block result_list %}
+    {% if record_summary %}
+        <div class="opd-summary-grid">
+            <div class="opd-summary-card">
+                <span class="opd-summary-label">Filtered visits</span>
+                <div class="opd-summary-value">{{ record_summary.visit_count }}</div>
+            </div>
+            <div class="opd-summary-card">
+                <span class="opd-summary-label">Filtered income</span>
+                <div class="opd-summary-value">{{ record_summary.total_income }}</div>
+            </div>
+        </div>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}

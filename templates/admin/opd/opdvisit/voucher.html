@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPD Voucher #{{ visit.id }}</title>
+    <style>
+        @page {
+            size: 80mm auto;
+            margin: 3mm;
+        }
+
+        body {
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            margin: 0;
+            color: #000;
+        }
+
+        .voucher {
+            width: 72mm;
+            margin: 0 auto;
+            padding: 4mm 2mm;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .line {
+            border-top: 1px dashed #000;
+            margin: 8px 0;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            gap: 6px;
+        }
+
+        .row .label {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .row .value {
+            text-align: right;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .total {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .actions a,
+        .actions button {
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            font-size: 12px;
+            padding: 4px 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        @media print {
+            .actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="voucher">
+        <div class="center title">Ali Medical and Dental Complex Fateh Jang</div>
+        <div class="center subtitle">OPD Voucher</div>
+
+        <div class="line"></div>
+
+        <div class="row"><span class="label">Voucher #</span><span class="value">{{ visit.id }}</span></div>
+        <div class="row"><span class="label">Date</span><span class="value">{{ visit.created_at|date:"d M Y h:i A" }}</span></div>
+        <div class="row"><span class="label">Patient</span><span class="value">{{ visit.patient.name }}</span></div>
+        <div class="row"><span class="label">Doctor</span><span class="value">{{ visit.doctor.name }}</span></div>
+        <div class="row"><span class="label">Token</span><span class="value">{{ visit.token_number }}</span></div>
+
+        <div class="line"></div>
+
+        <div class="row"><span class="label">Consultation Fee</span><span class="value">Rs. {{ visit.fee|floatformat:0 }}</span></div>
+        <div class="row total"><span class="label">Total</span><span class="value">Rs. {{ visit.total|floatformat:0 }}</span></div>
+
+        <div class="line"></div>
+
+        <div class="center">Thank you</div>
+
+        <div class="actions">
+            <button type="button" onclick="window.print()">Print Again</button>
+            <a href="{{ next_url }}">Back to Add Visit</a>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const nextUrl = "{{ next_url|escapejs }}" || "{% url 'admin:opd_opdvisit_add' %}";
+
+            window.addEventListener("load", function () {
+                setTimeout(function () {
+                    window.print();
+                }, 150);
+            });
+
+            window.addEventListener("afterprint", function () {
+                window.location.href = nextUrl;
+            });
+        })();
+    </script>
+</body>
+</html>

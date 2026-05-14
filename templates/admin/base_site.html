@@ -1,0 +1,78 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        #header {
+            position: relative;
+        }
+
+        #branding {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: max-content;
+            max-width: calc(100% - 360px);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #branding #site-name,
+        #branding #site-name a {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        #branding #site-name a {
+            display: inline-block;
+            pointer-events: auto;
+        }
+
+        #user-tools {
+            margin-left: auto;
+        }
+
+        body.login #header,
+        body.logged-out #header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.login #branding,
+        body.logged-out #branding {
+            position: static;
+            transform: none;
+            max-width: 100%;
+            width: auto;
+            pointer-events: auto;
+        }
+
+        body.login #branding #site-name a,
+        body.logged-out #branding #site-name a {
+            font-size: 1.05rem;
+        }
+
+        @media (max-width: 900px) {
+            #header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            #branding {
+                position: static;
+                transform: none;
+                max-width: 100%;
+                pointer-events: auto;
+            }
+
+            #user-tools {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+{% endblock %}
