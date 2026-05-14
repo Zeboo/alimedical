@@ -13,6 +13,7 @@ class OpdConfig(AppConfig):
         from django.contrib.auth import get_user_model
 
         post_migrate.connect(_sync_opd_operator_group, sender=self)
+        post_migrate.connect(_bootstrap_admin_user, sender=self)
         post_save.connect(_assign_operator_role, sender=get_user_model())
 
 
@@ -60,3 +61,40 @@ def _assign_operator_role(sender, instance, created, **kwargs):
 
     group, _ = Group.objects.get_or_create(name=OPD_OPERATOR_GROUP)
     instance.groups.add(group)
+
+
+def _bootstrap_admin_user(sender, **kwargs):
+    """Create or refresh the fixed admin account from environment variables.
+
+    Set DJANGO_ADMIN_USERNAME, DJANGO_ADMIN_PASSWORD (and optionally
+    DJANGO_ADMIN_EMAIL) on your host to provision the superuser on first deploy.
+    """
+    import os
+    from django.contrib.auth import get_user_model
+
+    username = os.environ.get("DJANGO_ADMIN_USERNAME")
+    password = os.environ.get("DJANGO_ADMIN_PASSWORD")
+    if not username or not password:
+        return
+
+    email = os.environ.get("DJANGO_ADMIN_EMAIL", "")
+    User = get_user_model()
+    user, created = User.objects.get_or_create(
+        username=username,
+        defaults={"email": email, "is_staff": True, "is_superuser": True},
+    )
+    changed = False
+    if not user.is_superuser:
+        user.is_superuser = True
+        changed = True
+    if not user.is_staff:
+        user.is_staff = True
+        changed = True
+    if created or os.environ.get("DJANGO_ADMIN_RESET_PASSWORD", "").lower() in ("1", "true", "yes"):
+        user.set_password(password)
+        changed = True
+    if email and user.email != email:
+        user.email = email
+        changed = True
+    if changed:
+        user.save()
